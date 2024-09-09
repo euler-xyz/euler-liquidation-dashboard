@@ -5,6 +5,7 @@ import { formatUnits } from 'ethers';
 
 interface Account {
     address: string;
+    account_address: string;
     sub_account: string;
     health_score: number;
     value_borrowed: string;
@@ -54,6 +55,8 @@ const AccountList: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
+    
+
     const formatHealthScore = (score: number): string => {
         return score.toFixed(4);
     };
@@ -92,8 +95,6 @@ const AccountList: React.FC = () => {
             return (aValue > bValue ? -1 : aValue < bValue ? 1 : 0) * (sortOrder === 'asc' ? -1 : 1);
         }
     });
-
-    console.log('Rendering AccountList, accounts:', accounts);
 
     if (loading) {
         return <CircularProgress />;
@@ -135,14 +136,14 @@ const AccountList: React.FC = () => {
                 </TableHead>
                 <TableBody>
                     {sortedAccounts.map((account) => (
-                        <TableRow key={account.address}>
+                        <TableRow key={account.account_address}>
                             <TableCell>
                                 <Link 
                                     href={`${process.env.REACT_APP_EULER_URL}/account/${account.sub_account}?spy=${account.address}`} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                 >
-                                    {account.address}
+                                    {account.account_address}
                                 </Link>
                             </TableCell>
                             <TableCell>{formatHealthScore(account.health_score)}</TableCell>
