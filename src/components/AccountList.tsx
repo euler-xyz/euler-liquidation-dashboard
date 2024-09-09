@@ -5,6 +5,7 @@ import { formatUnits } from 'ethers';
 
 interface Account {
     address: string;
+    sub_account: string;
     health_score: number;
     value_borrowed: string;
 }
@@ -137,7 +138,7 @@ const AccountList: React.FC = () => {
                         <TableRow key={account.address}>
                             <TableCell>
                                 <Link 
-                                    href={`${process.env.REACT_APP_EULER_URL}/?spy=${account.address}`} 
+                                    href={`${process.env.REACT_APP_EULER_URL}/account/${account.sub_account}?spy=${account.address}`} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                 >
