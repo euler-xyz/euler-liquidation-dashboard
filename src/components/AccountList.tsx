@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, CircularProgress, Link, TableSortLabel } from '@mui/material';
 import { formatUnits } from 'ethers';
-import { BACKEND_URL, EULER_URL } from '../constants';
 
 interface Account {
     address: string;
@@ -25,7 +24,7 @@ const AccountList: React.FC = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await axios.get(`${BACKEND_URL}/liquidation/allPositions`);
+                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/liquidation/allPositions`);
                 
                 let parsedData;
                 try {
@@ -138,7 +137,7 @@ const AccountList: React.FC = () => {
                         <TableRow key={account.address}>
                             <TableCell>
                                 <Link 
-                                    href={`${EULER_URL}/?spy=${account.address}`} 
+                                    href={`${process.env.REACT_APP_EULER_URL}/?spy=${account.address}`} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                 >

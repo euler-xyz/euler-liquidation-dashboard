@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { BrowserProvider, Contract, parseEther } from 'ethers';
-import { TextField, Button, Grid, Typography, Box, Paper } from '@mui/material';
+import { TextField, Button, Stack, Box, Paper } from '@mui/material';
 import liquidatorABI from '../abi/Liquidator.json';
 
 const LiquidationForm: React.FC = () => {
@@ -82,14 +82,15 @@ const LiquidationForm: React.FC = () => {
       alert('Please connect your wallet first!');
     }
   };
-
+  
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
       <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-        <Grid container spacing={2}>
-          {Object.entries(formData).map(([key, value]) => (
-            <Grid item xs={12} sm={6} key={key}>
+        <Stack direction="row" spacing={2}>
+          <Stack spacing={2} flex={1}>
+            {Object.entries(formData).slice(0, Math.ceil(Object.keys(formData).length / 2)).map(([key, value]) => (
               <TextField
+                key={key}
                 fullWidth
                 id={key}
                 name={key}
@@ -98,9 +99,23 @@ const LiquidationForm: React.FC = () => {
                 onChange={handleChange}
                 required
               />
-            </Grid>
-          ))}
-        </Grid>
+            ))}
+          </Stack>
+          <Stack spacing={2} flex={1}>
+            {Object.entries(formData).slice(Math.ceil(Object.keys(formData).length / 2)).map(([key, value]) => (
+              <TextField
+                key={key}
+                fullWidth
+                id={key}
+                name={key}
+                label={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
+                value={value}
+                onChange={handleChange}
+                required
+              />
+            ))}
+          </Stack>
+        </Stack>
         <Button
           type="submit"
           fullWidth
