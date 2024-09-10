@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, CircularProgress, Link, TableSortLabel } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, CircularProgress, Link, TableSortLabel, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, Box } from '@mui/material';
 import { formatUnits } from 'ethers';
 
 interface Account {
@@ -9,6 +9,8 @@ interface Account {
     sub_account: string;
     health_score: number;
     value_borrowed: string;
+    vault_name: string;
+    vault_symbol: string;
 }
 
 type SortField = 'health_score' | 'value_borrowed';
@@ -20,6 +22,7 @@ const AccountList: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [sortField, setSortField] = useState<SortField>('health_score');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+    const [vaultFilter, setVaultFilter] = useState<string>('');
 
     useEffect(() => {
         const fetchAccounts = async () => {
@@ -55,8 +58,6 @@ const AccountList: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
-    
-
     const formatHealthScore = (score: number): string => {
         return score.toFixed(4);
     };
@@ -86,6 +87,10 @@ const AccountList: React.FC = () => {
         }
     };
 
+    const handleVaultFilterChange = (event: SelectChangeEvent<string>) => {
+        setVaultFilter(event.target.value);
+    };
+
     const sortedAccounts = [...accounts].sort((a, b) => {
         if (sortField === 'health_score') {
             return (a.health_score - b.health_score) * (sortOrder === 'asc' ? 1 : -1);
@@ -95,6 +100,12 @@ const AccountList: React.FC = () => {
             return (aValue > bValue ? -1 : aValue < bValue ? 1 : 0) * (sortOrder === 'asc' ? -1 : 1);
         }
     });
+
+    const filteredAccounts = sortedAccounts.filter(account => 
+        vaultFilter === '' || account.vault_symbol === vaultFilter
+    );
+
+    const uniqueVaultSymbols = Array.from(new Set(accounts.map(account => account.vault_symbol)));
 
     if (loading) {
         return <CircularProgress />;
@@ -132,10 +143,27 @@ const AccountList: React.FC = () => {
                                 Value Borrowed (USD)
                             </TableSortLabel>
                         </TableCell>
+                        <TableCell>
+                            <Box display="flex" alignItems="center">
+                                Borrow Vault
+                                <Select
+                                    value={vaultFilter}
+                                    onChange={handleVaultFilterChange}
+                                    displayEmpty
+                                    size="small"
+                                    sx={{ marginLeft: 1, minWidth: 120 }}
+                                >
+                                    <MenuItem value="">All</MenuItem>
+                                    {uniqueVaultSymbols.map((symbol) => (
+                                        <MenuItem key={symbol} value={symbol}>{symbol}</MenuItem>
+                                    ))}
+                                </Select>
+                            </Box>
+                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {sortedAccounts.map((account) => (
+                    {filteredAccounts.map((account) => (
                         <TableRow key={account.account_address}>
                             <TableCell>
                                 <Link 
@@ -148,6 +176,7 @@ const AccountList: React.FC = () => {
                             </TableCell>
                             <TableCell>{formatHealthScore(account.health_score)}</TableCell>
                             <TableCell>{formatValueBorrowed(account.value_borrowed)}</TableCell>
+                            <TableCell>{account.vault_symbol}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
