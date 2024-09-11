@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Box } from '@mui/material';
 import AccountList from '../components/AccountList';
 
-const Dashboard: React.FC = () => {
+const HealthDashboard: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
@@ -13,4 +13,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default HealthDashboard;

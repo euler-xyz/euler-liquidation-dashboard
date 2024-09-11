@@ -2,7 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link as RouterLink } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline, AppBar, Toolbar, Container, Box, Link } from '@mui/material';
 import ExecuteLiquidation from './pages/ExecuteLiquidation';
-import Dashboard from './pages/Dashboard';
+import HealthDashboard from './pages/HealthDashboard';
+import PointsDashboard from './pages/PointsDashboard';
 import ConnectWallet from './components/ConnectWallet';
 
 const theme = createTheme({
@@ -30,7 +31,7 @@ const App: React.FC = () => {
                 underline="none"
                 sx={{ '&:hover': { textDecoration: 'underline' } }}
               >
-                Dashboard
+                Health Dashboard
               </Link>
               <Link 
                 component={RouterLink} 
@@ -41,6 +42,15 @@ const App: React.FC = () => {
               >
                 Liquidate
               </Link>
+              <Link 
+                component={RouterLink} 
+                to="/points" 
+                color="inherit" 
+                underline="none"
+                sx={{ '&:hover': { textDecoration: 'underline' } }}
+              >
+                Points Dashboard
+              </Link>
             </Box>
             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
               <ConnectWallet />
@@ -49,8 +59,9 @@ const App: React.FC = () => {
         </AppBar>
         <Container maxWidth="lg" sx={{ mt: 4 }}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<HealthDashboard />} />
             <Route path="/liquidate" element={<ExecuteLiquidation />} />
+            <Route path="/points" element={<PointsDashboard />} />
           </Routes>
         </Container>
       </Router>
