@@ -7,9 +7,10 @@ interface Account {
     address: string;
     lpXP: number;
     rank: number;
+    accrualRatePerDay?: number;
 }
 
-type SortField = 'lpXP' | 'rank';
+type SortField = 'lpXP' | 'rank' | 'accrualRatePerDay';
 type SortOrder = 'asc' | 'desc';
 
 const PointsList: React.FC = () => {
@@ -26,7 +27,25 @@ const PointsList: React.FC = () => {
                 setLoading(true);
                 setError(null);
                 const response = await axios.get(`${process.env.REACT_APP_POINTS_URL}/xp/depositors`);
-                setAccounts(response.data);
+                const accountsData = response.data;
+
+                // Fetch accrual rates for each account
+                const accountsWithRates = await Promise.all(accountsData.map(async (account: Account) => {
+                    try {
+                        const rateResponse = await axios.get(`${process.env.REACT_APP_POINTS_URL}/xp/depositor/rate`, {
+                            params: { address: account.address }
+                        });
+                        return {
+                            ...account,
+                            accrualRatePerDay: rateResponse.data.accrual_rate_per_day
+                        };
+                    } catch (error) {
+                        console.error(`Failed to fetch rate for ${account.address}:`, error);
+                        return account;
+                    }
+                }));
+
+                setAccounts(accountsWithRates);
             } catch (error) {
                 console.error('Failed to fetch accounts:', error);
                 setError(`Failed to fetch accounts: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -62,6 +81,8 @@ const PointsList: React.FC = () => {
         const multiplier = sortOrder === 'asc' ? 1 : -1;
         if (sortField === 'lpXP') {
             return (a.lpXP - b.lpXP) * multiplier;
+        } else if (sortField === 'accrualRatePerDay') {
+            return ((a.accrualRatePerDay || 0) - (b.accrualRatePerDay || 0)) * multiplier;
         } else {
             return (a.rank - b.rank) * multiplier;
         }
@@ -99,6 +120,15 @@ const PointsList: React.FC = () => {
                                 lpXP
                             </TableSortLabel>
                         </TableCell>
+                        <TableCell>
+                            <TableSortLabel
+                                active={sortField === 'accrualRatePerDay'}
+                                direction={sortField === 'accrualRatePerDay' ? sortOrder : 'asc'}
+                                onClick={() => handleSort('accrualRatePerDay')}
+                            >
+                                lpXP/Day
+                            </TableSortLabel>
+                        </TableCell>
                         <TableCell>Action</TableCell>
                     </TableRow>
                 </TableHead>
@@ -116,6 +146,7 @@ const PointsList: React.FC = () => {
                                 </Link>
                             </TableCell>
                             <TableCell>{formatLPXP(account.lpXP)}</TableCell>
+                            <TableCell>{account.accrualRatePerDay ? formatLPXP(account.accrualRatePerDay) : 'N/A'}</TableCell>
                             <TableCell>
                                 <Button 
                                     variant="contained" 
