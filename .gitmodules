@@ -1,0 +1,3 @@
+[submodule "euler-labels"]
+	path = euler-labels
+	url = git@github.com:euler-xyz/euler-labels.git
