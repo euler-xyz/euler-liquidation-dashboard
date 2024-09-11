@@ -115,14 +115,24 @@ const PointsList: React.FC = () => {
     const [vaultDialogOpen, setVaultDialogOpen] = useState(false);
     const [selectedCreator, setSelectedCreator] = useState<string>('');
     const [creatorVaults, setCreatorVaults] = useState<string[]>([]);
+    const [initializationMessage, setInitializationMessage] = useState<string | null>(null);
+    const [retryCount, setRetryCount] = useState(0);
 
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
                 setLoading(true);
                 setError(null);
+                setInitializationMessage(null);
                 const endpoint = tabValue === 'depositors' ? '/xp/depositors' : '/xp/creators';
                 const response = await axios.get(`${process.env.REACT_APP_POINTS_URL}${endpoint}`);
+                
+                if (response.data.status === "initializing") {
+                    setInitializationMessage(response.data.message);
+                    setAccounts([]);
+                    return;
+                }
+
                 const accountsData = response.data;
 
                 if (tabValue === 'depositors') {
@@ -132,6 +142,9 @@ const PointsList: React.FC = () => {
                             const rateResponse = await axios.get(`${process.env.REACT_APP_POINTS_URL}/xp/depositor/rate`, {
                                 params: { address: account.address }
                             });
+                            if (rateResponse.data.status === "initializing") {
+                                throw new Error(rateResponse.data.message);
+                            }
                             return {
                                 ...account,
                                 accrualRatePerDay: rateResponse.data.accrual_rate_per_day
@@ -147,7 +160,11 @@ const PointsList: React.FC = () => {
                 }
             } catch (error) {
                 console.error('Failed to fetch accounts:', error);
-                setError(`Failed to fetch accounts: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                if (axios.isAxiosError(error) && error.response?.data?.status === "initializing") {
+                    setInitializationMessage(error.response.data.message);
+                } else {
+                    setError(`Failed to fetch accounts: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                }
             } finally {
                 setLoading(false);
             }
@@ -157,7 +174,7 @@ const PointsList: React.FC = () => {
         const interval = setInterval(fetchAccounts, 60000); // Refresh every minute
 
         return () => clearInterval(interval);
-    }, [tabValue]);
+    }, [tabValue, retryCount]);
 
     const formatXP = (xp: number): string => {
         return xp.toLocaleString('en-US', { maximumFractionDigits: 2 });
@@ -187,6 +204,10 @@ const PointsList: React.FC = () => {
             const response = await axios.get(`${process.env.REACT_APP_POINTS_URL}/xp/vaults/creator`, {
                 params: { address: creatorAddress }
             });
+            if (response.data.status === "initializing") {
+                setInitializationMessage(response.data.message);
+                return;
+            }
             setCreatorVaults(response.data);
             setSelectedCreator(creatorAddress);
             setVaultDialogOpen(true);
@@ -217,12 +238,30 @@ const PointsList: React.FC = () => {
         }
     });
 
+    const handleRetry = () => {
+        setLoading(true);
+        setRetryCount(prevCount => prevCount + 1);
+    };
+
     if (selectedAddress) {
         return <HistoryPlot address={selectedAddress} onClose={() => setSelectedAddress(null)} />;
     }
 
     if (loading) {
         return <CircularProgress />;
+    }
+
+    if (initializationMessage) {
+        return (
+            <Box sx={{ marginTop: 2 }}>
+                <Typography color="warning">
+                    Warning: {initializationMessage}
+                </Typography>
+                <Button onClick={handleRetry} sx={{ marginTop: 1 }}>
+                    Retry
+                </Button>
+            </Box>
+        );
     }
 
     if (error) {
