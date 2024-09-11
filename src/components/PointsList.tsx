@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { 
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, 
@@ -105,7 +105,6 @@ const VaultDialog: React.FC<VaultDialogProps> = ({ open, onClose, creatorAddress
 };
 
 const PointsList: React.FC = () => {
-    const [accounts, setAccounts] = useState<Account[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [sortField, setSortField] = useState<SortField>('rank');
@@ -116,65 +115,91 @@ const PointsList: React.FC = () => {
     const [selectedCreator, setSelectedCreator] = useState<string>('');
     const [creatorVaults, setCreatorVaults] = useState<string[]>([]);
     const [initializationMessage, setInitializationMessage] = useState<string | null>(null);
-    const [retryCount, setRetryCount] = useState(0);
+    const [depositorAccounts, setDepositorAccounts] = useState<Account[]>([]);
+    const [creatorAccounts, setCreatorAccounts] = useState<Account[]>([]);
+
+    const fetchAccounts = useCallback(async () => {
+        try {
+            const endpoint = tabValue === 'depositors' ? '/xp/depositors' : '/xp/creators';
+            const response = await axios.get(`${process.env.REACT_APP_POINTS_URL}${endpoint}`);
+            
+            if (response.data.status === "initializing") {
+                setInitializationMessage(response.data.message);
+                return;
+            }
+
+            const accountsData = response.data;
+
+            if (tabValue === 'depositors') {
+                // Fetch accrual rates for depositors
+                const accountsWithRates = await Promise.all(accountsData.map(async (account: Account) => {
+                    try {
+                        const rateResponse = await axios.get(`${process.env.REACT_APP_POINTS_URL}/xp/depositor/rate`, {
+                            params: { address: account.address }
+                        });
+                        if (rateResponse.data.status === "initializing") {
+                            throw new Error(rateResponse.data.message);
+                        }
+                        return {
+                            ...account,
+                            accrualRatePerDay: rateResponse.data.accrual_rate_per_day
+                        };
+                    } catch (error) {
+                        console.error(`Failed to fetch rate for ${account.address}:`, error);
+                        return account;
+                    }
+                }));
+                setDepositorAccounts(prev => {
+                    // Only update if there are changes
+                    if (JSON.stringify(prev) !== JSON.stringify(accountsWithRates)) {
+                        return accountsWithRates;
+                    }
+                    return prev;
+                });
+            } else {
+                setCreatorAccounts(prev => {
+                    // Only update if there are changes
+                    if (JSON.stringify(prev) !== JSON.stringify(accountsData)) {
+                        return accountsData;
+                    }
+                    return prev;
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch accounts:', error);
+            if (axios.isAxiosError(error) && error.response?.data?.status === "initializing") {
+                setInitializationMessage(error.response.data.message);
+            } else {
+                setError(`Failed to fetch accounts: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [tabValue]);
 
     useEffect(() => {
-        const fetchAccounts = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                setInitializationMessage(null);
-                const endpoint = tabValue === 'depositors' ? '/xp/depositors' : '/xp/creators';
-                const response = await axios.get(`${process.env.REACT_APP_POINTS_URL}${endpoint}`);
-                
-                if (response.data.status === "initializing") {
-                    setInitializationMessage(response.data.message);
-                    setAccounts([]);
-                    return;
-                }
-
-                const accountsData = response.data;
-
-                if (tabValue === 'depositors') {
-                    // Fetch accrual rates for depositors
-                    const accountsWithRates = await Promise.all(accountsData.map(async (account: Account) => {
-                        try {
-                            const rateResponse = await axios.get(`${process.env.REACT_APP_POINTS_URL}/xp/depositor/rate`, {
-                                params: { address: account.address }
-                            });
-                            if (rateResponse.data.status === "initializing") {
-                                throw new Error(rateResponse.data.message);
-                            }
-                            return {
-                                ...account,
-                                accrualRatePerDay: rateResponse.data.accrual_rate_per_day
-                            };
-                        } catch (error) {
-                            console.error(`Failed to fetch rate for ${account.address}:`, error);
-                            return account;
-                        }
-                    }));
-                    setAccounts(accountsWithRates);
-                } else {
-                    setAccounts(accountsData);
-                }
-            } catch (error) {
-                console.error('Failed to fetch accounts:', error);
-                if (axios.isAxiosError(error) && error.response?.data?.status === "initializing") {
-                    setInitializationMessage(error.response.data.message);
-                } else {
-                    setError(`Failed to fetch accounts: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchAccounts();
         const interval = setInterval(fetchAccounts, 60000); // Refresh every minute
 
         return () => clearInterval(interval);
-    }, [tabValue, retryCount]);
+    }, [fetchAccounts]);
+
+    const currentAccounts = useMemo(() => 
+        tabValue === 'depositors' ? depositorAccounts : creatorAccounts, 
+    [tabValue, depositorAccounts, creatorAccounts]);
+
+    const sortedAccounts = useMemo(() => 
+        [...currentAccounts].sort((a, b) => {
+            const multiplier = sortOrder === 'asc' ? 1 : -1;
+            if (sortField === 'lpXP' || sortField === 'vcXP') {
+                return ((a[sortField] || 0) - (b[sortField] || 0)) * multiplier;
+            } else if (sortField === 'accrualRatePerDay') {
+                return ((a.accrualRatePerDay || 0) - (b.accrualRatePerDay || 0)) * multiplier;
+            } else {
+                return (a.rank - b.rank) * multiplier;
+            }
+        }),
+    [currentAccounts, sortField, sortOrder]);
 
     const formatXP = (xp: number): string => {
         return xp.toLocaleString('en-US', { maximumFractionDigits: 2 });
@@ -197,6 +222,10 @@ const PointsList: React.FC = () => {
         setTabValue(newValue);
         setSortField('rank');
         setSortOrder('asc');
+        if ((newValue === 'depositors' && depositorAccounts.length === 0) ||
+            (newValue === 'creators' && creatorAccounts.length === 0)) {
+            setLoading(true);
+        }
     };
 
     const handleVaultClick = async (creatorAddress: string) => {
@@ -227,20 +256,9 @@ const PointsList: React.FC = () => {
         }
     };
 
-    const sortedAccounts = [...accounts].sort((a, b) => {
-        const multiplier = sortOrder === 'asc' ? 1 : -1;
-        if (sortField === 'lpXP' || sortField === 'vcXP') {
-            return ((a[sortField] || 0) - (b[sortField] || 0)) * multiplier;
-        } else if (sortField === 'accrualRatePerDay') {
-            return ((a.accrualRatePerDay || 0) - (b.accrualRatePerDay || 0)) * multiplier;
-        } else {
-            return (a.rank - b.rank) * multiplier;
-        }
-    });
-
     const handleRetry = () => {
         setLoading(true);
-        setRetryCount(prevCount => prevCount + 1);
+        fetchAccounts(); // Directly call fetchAccounts instead of incrementing retryCount
     };
 
     if (selectedAddress) {
@@ -268,7 +286,7 @@ const PointsList: React.FC = () => {
         return <Typography color="error">{error}</Typography>;
     }
 
-    if (accounts.length === 0) {
+    if (sortedAccounts.length === 0) {
         return <Typography>No accounts found.</Typography>;
     }
 
