@@ -13,6 +13,30 @@ import HistoryPlot from './HistoryPlot';
 import entitiesData from '../json/entities.json';
 import vaultsData from '../json/vaults.json';
 
+// Define types for the JSON data
+type EntityData = {
+    [key: string]: {
+        name: string;
+        logo: string;
+        description?: string;
+        url?: string;
+        addresses: { [key: string]: string };
+        social?: { [key: string]: string };
+    }
+};
+
+type VaultData = {
+    [key: string]: {
+        name: string;
+        description: string;
+        entity: string;
+    }
+};
+
+// Use the defined types
+const entities: EntityData = entitiesData;
+const vaults: VaultData = vaultsData;
+
 interface Account {
     address: string;
     lpXP?: number;
@@ -32,20 +56,16 @@ type SortField = 'lpXP' | 'vcXP' | 'rank' | 'accrualRatePerDay';
 type SortOrder = 'asc' | 'desc';
 type TabValue = 'depositors' | 'creators';
 
-const VaultDialog: React.FC<VaultDialogProps> = ({ open, onClose, creatorAddress, vaults }) => {
-    const creatorInfo = (entitiesData as any)[creatorAddress];
+const VaultDialog: React.FC<VaultDialogProps> = ({ open, onClose, creatorAddress, vaults: creatorVaults }) => {
+    const creatorInfo = Object.values(entities).find(entity => 
+        Object.keys(entity.addresses).includes(creatorAddress)
+    );
     const creatorName = creatorInfo?.name || creatorAddress;
     const creatorLogo = creatorInfo?.logo;
     const creatorDescription = creatorInfo?.description;
     
-    console.log('Vaults data:', vaultsData);
-    console.log('Vaults for creator:', vaults);
-
-    // Create a case-insensitive lookup for vault addresses
-    const vaultLookup = Object.keys(vaultsData).reduce((acc, key) => {
-        acc[key.toLowerCase()] = (vaultsData as any)[key];
-        return acc;
-    }, {} as Record<string, any>);
+    console.log('Vaults data:', vaults);
+    console.log('Vaults for creator:', creatorVaults);
 
     return (
         <Dialog open={open} onClose={onClose}>
@@ -70,15 +90,17 @@ const VaultDialog: React.FC<VaultDialogProps> = ({ open, onClose, creatorAddress
             </DialogTitle>
             <DialogContent>
                 <List>
-                    {vaults.map((vault) => {
-                        const vaultInfo = vaultLookup[vault.toLowerCase()];
-                        const vaultName = vaultInfo?.name || vault;
-                        const vaultDescription = vaultInfo?.description;
+                    {creatorVaults.map((vaultAddress) => {
+                        const vaultInfo = Object.entries(vaults).find(([address, info]) => 
+                            address.toLowerCase() === vaultAddress.toLowerCase()
+                        );
+                        const vaultName = vaultInfo ? vaultInfo[1].name : vaultAddress;
+                        const vaultDescription = vaultInfo ? vaultInfo[1].description : '';
                         return (
-                            <ListItem key={vault}>
+                            <ListItem key={vaultAddress}>
                                 <Box display="flex" alignItems="center">
                                     <Link 
-                                        href={`${process.env.REACT_APP_EULER_URL}/vault/${vault}`}
+                                        href={`${process.env.REACT_APP_EULER_URL}/vault/${vaultAddress}`}
                                         target="_blank" 
                                         rel="noopener noreferrer"
                                     >
@@ -247,12 +269,13 @@ const PointsList: React.FC = () => {
 
     const getDisplayName = (address: string, isCreator: boolean) => {
         if (isCreator) {
-            return (entitiesData as any)[address]?.name || address;
-        } else {
-            const vaultInfo = Object.entries(vaultsData).find(
-                ([key]) => key.toLowerCase() === address.toLowerCase()
+            const entity = Object.values(entities).find(entity => 
+                Object.keys(entity.addresses).includes(address)
             );
-            return vaultInfo ? vaultInfo[1].name : address;
+            return entity?.name || address;
+        } else {
+            const vault = Object.values(vaults).find(vault => vault.entity.toLowerCase() === address.toLowerCase());
+            return vault?.name || address;
         }
     };
 
@@ -336,13 +359,18 @@ const PointsList: React.FC = () => {
                                 <TableCell>{account.rank}</TableCell>
                                 <TableCell>
                                     <Box display="flex" alignItems="center">
-                                        {tabValue === 'creators' && (entitiesData as any)[account.address]?.logo && (
-                                            <Avatar 
-                                                src={`${process.env.PUBLIC_URL}/${(entitiesData as any)[account.address].logo}`} 
-                                                alt={getDisplayName(account.address, tabValue === 'creators')}
-                                                sx={{ width: 24, height: 24, marginRight: 1 }}
-                                            />
-                                        )}
+                                        {tabValue === 'creators' && (() => {
+                                            const entity = Object.values(entities).find(entity => 
+                                                Object.keys(entity.addresses).includes(account.address)
+                                            );
+                                            return entity?.logo && (
+                                                <Avatar 
+                                                    src={`${process.env.PUBLIC_URL}/${entity.logo}`} 
+                                                    alt={getDisplayName(account.address, tabValue === 'creators')}
+                                                    sx={{ width: 24, height: 24, marginRight: 1 }}
+                                                />
+                                            );
+                                        })()}
                                         <Link 
                                             href={`${process.env.REACT_APP_EULER_URL}/?spy=${account.address}`} 
                                             target="_blank" 
@@ -350,13 +378,18 @@ const PointsList: React.FC = () => {
                                         >
                                             {getDisplayName(account.address, tabValue === 'creators')}
                                         </Link>
-                                        {tabValue === 'creators' && (entitiesData as any)[account.address]?.description && (
-                                            <Tooltip title={(entitiesData as any)[account.address].description}>
-                                                <IconButton size="small" sx={{ marginLeft: 1 }}>
-                                                    <InfoIcon fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                        )}
+                                        {tabValue === 'creators' && (() => {
+                                            const entity = Object.values(entities).find(entity => 
+                                                Object.keys(entity.addresses).includes(account.address)
+                                            );
+                                            return entity?.description && (
+                                                <Tooltip title={entity.description}>
+                                                    <IconButton size="small" sx={{ marginLeft: 1 }}>
+                                                        <InfoIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            );
+                                        })()}
                                     </Box>
                                 </TableCell>
                                 <TableCell>{formatXP(tabValue === 'depositors' ? account.lpXP || 0 : account.vcXP || 0)}</TableCell>
