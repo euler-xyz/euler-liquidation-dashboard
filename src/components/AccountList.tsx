@@ -156,83 +156,86 @@ const AccountList: React.FC = () => {
     }
 
     return (
-        <>
-            <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
-                <Tab label="Account Health" />
-                <Tab label="Protocol Risk Metrics" />
-            </Tabs>
-
-            {tabValue === 0 ? (
-                <TableContainer component={Paper} elevation={2}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Address</TableCell>
-                                <TableCell>
-                                    <TableSortLabel
-                                        active={sortField === 'health_score'}
-                                        direction={sortField === 'health_score' ? sortOrder : 'asc'}
-                                        onClick={() => handleSort('health_score')}
-                                    >
-                                        Health Score
-                                    </TableSortLabel>
-                                </TableCell>
-                                <TableCell>
-                                    <TableSortLabel
-                                        active={sortField === 'value_borrowed'}
-                                        direction={sortField === 'value_borrowed' ? sortOrder : 'desc'}
-                                        onClick={() => handleSort('value_borrowed')}
-                                    >
-                                        Value Borrowed (USD)
-                                    </TableSortLabel>
-                                </TableCell>
-                                <TableCell>
-                                    <Box display="flex" alignItems="center">
-                                        Borrow Vault
-                                        <Select
-                                            value={vaultFilter}
-                                            onChange={handleVaultFilterChange}
-                                            displayEmpty
-                                            size="small"
-                                            sx={{ marginLeft: 1, minWidth: 120 }}
-                                        >
-                                            <MenuItem value="">All</MenuItem>
-                                            {uniqueVaultSymbols.map((symbol) => (
-                                                <MenuItem key={symbol} value={symbol}>{symbol}</MenuItem>
-                                            ))}
-                                        </Select>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filteredAccounts.map((account) => (
-                                <TableRow key={account.account_address}>
+        <Box sx={{ width: '100%' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={tabValue} onChange={handleTabChange}>
+                    <Tab label="Account Health" />
+                    <Tab label="Protocol Risk Metrics" />
+                </Tabs>
+            </Box>
+            <Box sx={{ mt: 0 }}>
+                {tabValue === 0 ? (
+                    <TableContainer component={Paper} elevation={2} sx={{ mt: 0 }}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Address</TableCell>
                                     <TableCell>
-                                        <Link 
-                                            href={`${process.env.REACT_APP_EULER_URL}/account/${account.sub_account}?spy=${account.address}`} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
+                                        <TableSortLabel
+                                            active={sortField === 'health_score'}
+                                            direction={sortField === 'health_score' ? sortOrder : 'asc'}
+                                            onClick={() => handleSort('health_score')}
                                         >
-                                            {account.account_address}
-                                        </Link>
+                                            Health Score
+                                        </TableSortLabel>
                                     </TableCell>
-                                    <TableCell>{formatHealthScore(account.health_score)}</TableCell>
-                                    <TableCell>{formatValueBorrowed(account.value_borrowed)}</TableCell>
-                                    <TableCell>{account.vault_symbol}</TableCell>
+                                    <TableCell>
+                                        <TableSortLabel
+                                            active={sortField === 'value_borrowed'}
+                                            direction={sortField === 'value_borrowed' ? sortOrder : 'desc'}
+                                            onClick={() => handleSort('value_borrowed')}
+                                        >
+                                            Value Borrowed (USD)
+                                        </TableSortLabel>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Box display="flex" alignItems="center">
+                                            Borrow Vault
+                                            <Select
+                                                value={vaultFilter}
+                                                onChange={handleVaultFilterChange}
+                                                displayEmpty
+                                                size="small"
+                                                sx={{ marginLeft: 1, minWidth: 120 }}
+                                            >
+                                                <MenuItem value="">All</MenuItem>
+                                                {uniqueVaultSymbols.map((symbol) => (
+                                                    <MenuItem key={symbol} value={symbol}>{symbol}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </Box>
+                                    </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            ) : (
-                <RiskMetrics 
-                    totalValueBorrowed={totalValueBorrowed}
-                    accountsWithBorrow={accountsWithBorrow}
-                    assetTotals={assetTotals}
-                />
-            )}
-        </>
+                            </TableHead>
+                            <TableBody>
+                                {filteredAccounts.map((account) => (
+                                    <TableRow key={account.account_address}>
+                                        <TableCell>
+                                            <Link 
+                                                href={`${process.env.REACT_APP_EULER_URL}/account/${account.sub_account}?spy=${account.address}`} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                            >
+                                                {account.account_address}
+                                            </Link>
+                                        </TableCell>
+                                        <TableCell>{formatHealthScore(account.health_score)}</TableCell>
+                                        <TableCell>{formatValueBorrowed(account.value_borrowed)}</TableCell>
+                                        <TableCell>{account.vault_symbol}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                ) : (
+                    <RiskMetrics 
+                        totalValueBorrowed={totalValueBorrowed}
+                        accountsWithBorrow={accountsWithBorrow}
+                        assetTotals={assetTotals}
+                    />
+                )}
+            </Box>
+        </Box>
     );
 };
 
