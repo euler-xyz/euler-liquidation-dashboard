@@ -53,7 +53,7 @@ const App: React.FC = () => {
               </Link>
             </Box>
             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
-              <ConnectWallet />
+              {/* <ConnectWallet /> */}
             </Box>
           </Toolbar>
         </AppBar>
