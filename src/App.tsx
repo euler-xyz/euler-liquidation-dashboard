@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link as RouterLink } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline, AppBar, Toolbar, Container, Box, Link, Typography } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, AppBar, Toolbar, Container, Box, Link } from '@mui/material';
 import ExecuteLiquidation from './pages/ExecuteLiquidation';
 import RiskDashboard from './pages/RiskDashboard';
 import PointsDashboard from './pages/PointsDashboard';
