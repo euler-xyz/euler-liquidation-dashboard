@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link as RouterLink } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline, AppBar, Toolbar, Container, Box, Link } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, AppBar, Toolbar, Container, Box, Link, Typography } from '@mui/material';
 import ExecuteLiquidation from './pages/ExecuteLiquidation';
-import HealthDashboard from './pages/HealthDashboard';
+import RiskDashboard from './pages/RiskDashboard';
 import PointsDashboard from './pages/PointsDashboard';
 import ConnectWallet from './components/ConnectWallet';
 
@@ -31,9 +31,9 @@ const App: React.FC = () => {
                 underline="none"
                 sx={{ '&:hover': { textDecoration: 'underline' } }}
               >
-                Health Dashboard
+                Risk Dashboard
               </Link>
-              <Link 
+              {/* <Link 
                 component={RouterLink} 
                 to="/liquidate" 
                 color="inherit" 
@@ -41,7 +41,7 @@ const App: React.FC = () => {
                 sx={{ '&:hover': { textDecoration: 'underline' } }}
               >
                 Liquidate
-              </Link>
+              </Link> */}
               <Link 
                 component={RouterLink} 
                 to="/points" 
@@ -59,7 +59,7 @@ const App: React.FC = () => {
         </AppBar>
         <Container maxWidth="lg" sx={{ mt: 4 }}>
           <Routes>
-            <Route path="/" element={<HealthDashboard />} />
+            <Route path="/" element={<RiskDashboard />} />
             <Route path="/liquidate" element={<ExecuteLiquidation />} />
             <Route path="/points" element={<PointsDashboard />} />
           </Routes>
