@@ -17,7 +17,11 @@ interface Account {
 type SortField = 'health_score' | 'value_borrowed';
 type SortOrder = 'asc' | 'desc';
 
-const AccountList: React.FC = () => {
+interface AccountListProps {
+  chainId: string;
+}
+
+const AccountList: React.FC<AccountListProps> = ({ chainId }) => {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -31,7 +35,11 @@ const AccountList: React.FC = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/liquidation/allPositions`);
+                const requestUrl = chainId === '1' 
+                    ? `${process.env.REACT_APP_BACKEND_URL}/liquidation/allPositions`
+                    : `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=${chainId}`;
+                
+                const response = await axios.get(requestUrl);
                 
                 let parsedData;
                 try {
@@ -55,10 +63,10 @@ const AccountList: React.FC = () => {
         };
 
         fetchAccounts();
-        const interval = setInterval(fetchAccounts, 60000); // Refresh every minute
+        const interval = setInterval(fetchAccounts, 60000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [chainId]);
 
     const formatValueBorrowed = (value: string): string => {
         try {
@@ -212,7 +220,7 @@ const AccountList: React.FC = () => {
                                     <TableRow key={account.account_address}>
                                         <TableCell>
                                             <Link 
-                                                href={`${process.env.REACT_APP_EULER_URL}/account/${account.sub_account}?spy=${account.address}`} 
+                                                href={`${process.env.REACT_APP_EULER_URL}/account/${account.sub_account}?spy=${account.address}&chainId=${chainId}`} 
                                                 target="_blank" 
                                                 rel="noopener noreferrer"
                                             >

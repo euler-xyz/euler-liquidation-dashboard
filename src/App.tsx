@@ -1,10 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link as RouterLink } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline, AppBar, Toolbar, Container, Box, Link } from '@mui/material';
-import ExecuteLiquidation from './pages/ExecuteLiquidation';
 import RiskDashboard from './pages/RiskDashboard';
-import PointsDashboard from './pages/PointsDashboard';
-import ConnectWallet from './components/ConnectWallet';
 
 const theme = createTheme({
   palette: {
@@ -26,30 +23,39 @@ const App: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <Link 
                 component={RouterLink} 
-                to="/" 
+                to="/mainnet" 
                 color="inherit" 
                 underline="none"
                 sx={{ '&:hover': { textDecoration: 'underline' } }}
               >
-                Risk Dashboard
+                Mainnet
               </Link>
-              {/* <Link 
-                component={RouterLink} 
-                to="/liquidate" 
-                color="inherit" 
-                underline="none"
-                sx={{ '&:hover': { textDecoration: 'underline' } }}
-              >
-                Liquidate
-              </Link> */}
               <Link 
                 component={RouterLink} 
-                to="/points" 
+                to="/base" 
                 color="inherit" 
                 underline="none"
                 sx={{ '&:hover': { textDecoration: 'underline' } }}
               >
-                Points Dashboard
+                Base
+              </Link>
+              <Link 
+                component={RouterLink} 
+                to="/swell" 
+                color="inherit" 
+                underline="none"
+                sx={{ '&:hover': { textDecoration: 'underline' } }}
+              >
+                Swell
+              </Link>
+              <Link 
+                component={RouterLink} 
+                to="/sonic" 
+                color="inherit" 
+                underline="none"
+                sx={{ '&:hover': { textDecoration: 'underline' } }}
+              >
+                Sonic
               </Link>
             </Box>
             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
@@ -59,9 +65,11 @@ const App: React.FC = () => {
         </AppBar>
         <Container maxWidth="lg" sx={{ mt: 4 }}>
           <Routes>
-            <Route path="/" element={<RiskDashboard />} />
-            <Route path="/liquidate" element={<ExecuteLiquidation />} />
-            <Route path="/points" element={<PointsDashboard />} />
+            <Route path="/" element={<RiskDashboard chainId="1" />} />
+            <Route path="/mainnet" element={<RiskDashboard chainId="1" />} />
+            <Route path="/base" element={<RiskDashboard chainId="8453" />} />
+            <Route path="/swell" element={<RiskDashboard chainId="1923" />} />
+            <Route path="/sonic" element={<RiskDashboard chainId="146" />} />
           </Routes>
         </Container>
       </Router>

@@ -42,7 +42,9 @@ const RiskMetrics: React.FC<RiskMetricsProps> = ({ totalValueBorrowed, accountsW
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {Object.entries(assetTotals).map(([asset, value]) => (
+                        {Object.entries(assetTotals)
+                            .sort(([, a], [, b]) => Number(b.replace(/[^0-9.-]+/g, '')) - Number(a.replace(/[^0-9.-]+/g, '')))
+                            .map(([asset, value]) => (
                             <TableRow key={asset}>
                                 <TableCell>{asset}</TableCell>
                                 <TableCell>{value}</TableCell>

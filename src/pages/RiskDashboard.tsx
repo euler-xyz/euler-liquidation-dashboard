@@ -2,13 +2,17 @@ import React from 'react';
 import { Typography, Box } from '@mui/material';
 import AccountList from '../components/AccountList';
 
-const RiskDashboard: React.FC = () => {
+interface RiskDashboardProps {
+  chainId: string;
+}
+
+const RiskDashboard: React.FC<RiskDashboardProps> = ({ chainId }) => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
         Risk Dashboard
       </Typography>
-    <AccountList />
+      <AccountList chainId={chainId} />
     </Box>
   );
 };
