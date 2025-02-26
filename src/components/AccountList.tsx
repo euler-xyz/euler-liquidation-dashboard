@@ -78,6 +78,10 @@ const AccountList: React.FC<AccountListProps> = () => {
             id: "146",
             url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=146`,
           },
+          {
+            id: "60808",
+            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=60808`,
+          },
         ];
 
         const results = await Promise.allSettled(
@@ -307,7 +311,8 @@ const AccountList: React.FC<AccountListProps> = () => {
                     option === "1" ? "Mainnet" :
                     option === "8453" ? "Base" :
                     option === "1923" ? "Swell" :
-                    option === "146" ? "Sonic" : "Unknown"
+                    option === "146" ? "Sonic" :
+                    option === "60808" ? "BOB" : "Unknown"
                   }
                   renderInput={(params) => (
                     <TextField {...params} />
@@ -448,6 +453,8 @@ const AccountList: React.FC<AccountListProps> = () => {
                           ? "Swell"
                           : account.networkChainId === "146"
                           ? "Sonic"
+                          : account.networkChainId === "60808"
+                          ? "BOB"
                           : "Unknown"}
                       </TableCell>
                     </TableRow>
