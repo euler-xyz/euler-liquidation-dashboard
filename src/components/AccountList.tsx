@@ -327,7 +327,8 @@ const AccountList: React.FC<AccountListProps> = () => {
                     option === "60808" ? "BOB" : 
                     option === "80094" ? "Berachain" :
                     option === "43114" ? "Avalanche" :
-                    option === "56" ? "BNB" : "Unknown"
+                    option === "56" ? "BNB" :
+                    option === "130" ? "Unichain" : "Unknown"
                   }
                   renderInput={(params) => (
                     <TextField {...params} />
@@ -476,6 +477,8 @@ const AccountList: React.FC<AccountListProps> = () => {
                           ? "Avalanche"
                           : account.networkChainId === "56"
                           ? "BNB"
+                          : account.networkChainId === "130"
+                          ? "Unichain"
                           : "Unknown"}
                       </TableCell>
                     </TableRow>
