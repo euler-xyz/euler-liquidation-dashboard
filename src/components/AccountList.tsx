@@ -93,6 +93,10 @@ const AccountList: React.FC<AccountListProps> = () => {
           {
             id: "56",
             url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=56`,
+          },
+          {
+            id: "130",
+            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=130`,
           }
         ];
 
