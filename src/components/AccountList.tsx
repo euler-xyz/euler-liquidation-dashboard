@@ -97,6 +97,10 @@ const AccountList: React.FC<AccountListProps> = () => {
           {
             id: "130",
             url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=130`,
+          },
+          {
+            id: "42161",
+            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=42161`,
           }
         ];
 
@@ -332,7 +336,8 @@ const AccountList: React.FC<AccountListProps> = () => {
                     option === "80094" ? "Berachain" :
                     option === "43114" ? "Avalanche" :
                     option === "56" ? "BNB" :
-                    option === "130" ? "Unichain" : "Unknown"
+                    option === "130" ? "Unichain" :
+                    option === "42161" ? "Arbitrum" : "Unknown"
                   }
                   renderInput={(params) => (
                     <TextField {...params} />
@@ -483,6 +488,8 @@ const AccountList: React.FC<AccountListProps> = () => {
                           ? "BNB"
                           : account.networkChainId === "130"
                           ? "Unichain"
+                          : account.networkChainId === "42161"
+                          ? "Arbitrum"
                           : "Unknown"}
                       </TableCell>
                     </TableRow>
