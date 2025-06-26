@@ -99,7 +99,7 @@ const AccountList: React.FC<AccountListProps> = () => {
             url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=130`,
           },
           {
-            id: "130",
+            id: "42161",
             url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=42161`,
           }
         ];
