@@ -56,6 +56,8 @@ const RiskMetrics: React.FC<RiskMetricsProps> = ({ totalValueBorrowed, accountsW
                                     ? "Unichain"
                                     : networkId === "42161"
                                     ? "Arbitrum"
+                                    : networkId === "239"
+                                    ? "TAC"
                                     : "Unknown"}
                             </MenuItem>
                         ))}
