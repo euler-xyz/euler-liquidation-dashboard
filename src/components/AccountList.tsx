@@ -83,6 +83,10 @@ const AccountList: React.FC<AccountListProps> = () => {
             url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=239`,
           },
           {
+            id: "59144",
+            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=59144`,
+          },
+          {
             id: "60808",
             url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=60808`,
           },
@@ -341,6 +345,7 @@ const AccountList: React.FC<AccountListProps> = () => {
                     option === "80094" ? "Berachain" :
                     option === "43114" ? "Avalanche" :
                     option === "56" ? "BNB" :
+                    option === "59144" ? "Linea" :
                     option === "130" ? "Unichain" :
                     option === "42161" ? "Arbitrum" : "Unknown"
                   }
@@ -493,6 +498,8 @@ const AccountList: React.FC<AccountListProps> = () => {
                           ? "Avalanche"
                           : account.networkChainId === "56"
                           ? "BNB"
+                          : account.networkChainId === "59144"
+                          ? "Linea"
                           : account.networkChainId === "130"
                           ? "Unichain"
                           : account.networkChainId === "42161"
