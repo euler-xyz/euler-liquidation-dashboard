@@ -64,55 +64,55 @@ const AccountList: React.FC<AccountListProps> = () => {
         const networks = [
           {
             id: "1",
-            url: `${process.env.REACT_APP_BACKEND_URL}/liquidation/allPositions`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/1/liquidation/allPositions`,
           },
           {
             id: "8453",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=8453`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/8453/liquidation/allPositions`,
           },
           {
             id: "1923",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=1923`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/1923/liquidation/allPositions`,
           },
           {
             id: "146",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=146`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/146/liquidation/allPositions`,
           },
           {
             id: "239",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=239`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/239/liquidation/allPositions`,
           },
           {
             id: "59144",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=59144`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/59144/liquidation/allPositions`,
           },
           {
             id: "60808",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=60808`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/60808/liquidation/allPositions`,
           },
           {
             id: "80094",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=80094`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/80094/liquidation/allPositions`,
           },
           {
             id: "43114",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=43114`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/43114/liquidation/allPositions`,
           },
           {
             id: "56",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=56`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/56/liquidation/allPositions`,
           },
           {
             id: "9745",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=9745`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/9745/liquidation/allPositions`,
           },
           {
             id: "130",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=130`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/130/liquidation/allPositions`,
           },
           {
             id: "42161",
-            url: `${process.env.REACT_APP_MULTI_BACKEND_URL}/liquidation/allPositions?chainId=42161`,
+            url: `${process.env.REACT_APP_BACKEND_URL}/42161/liquidation/allPositions`,
           }
         ];
 
