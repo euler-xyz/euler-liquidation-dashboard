@@ -111,6 +111,10 @@ const AccountList: React.FC<AccountListProps> = () => {
             url: `${process.env.REACT_APP_BACKEND_URL}/130/liquidation/allPositions`,
           },
           {
+            id: "143",
+            url: `${process.env.REACT_APP_BACKEND_URL}/143/liquidation/allPositions`,
+          },
+          {
             id: "42161",
             url: `${process.env.REACT_APP_BACKEND_URL}/42161/liquidation/allPositions`,
           }
@@ -352,6 +356,7 @@ const AccountList: React.FC<AccountListProps> = () => {
                     option === "59144" ? "Linea" :
                     option === "9745" ? "Plasma" :
                     option === "130" ? "Unichain" :
+                    option === "143" ? "Monad" :
                     option === "42161" ? "Arbitrum" : "Unknown"
                   }
                   renderInput={(params) => (
@@ -509,6 +514,8 @@ const AccountList: React.FC<AccountListProps> = () => {
                           ? "Plasma"
                           : account.networkChainId === "130"
                           ? "Unichain"
+                          : account.networkChainId === "143"
+                          ? "Monad"
                           : account.networkChainId === "42161"
                           ? "Arbitrum"
                           : "Unknown"}
